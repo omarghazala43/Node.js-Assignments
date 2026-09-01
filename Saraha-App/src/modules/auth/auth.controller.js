@@ -1,5 +1,14 @@
 import { Router } from "express";
-import { login, signUp } from "./auth.service.js";
+import {
+  confirmEmail,
+  forgetPassword,
+  forgetPasswordLink,
+  login,
+  resendOtp,
+  resetPassword,
+  resetPasswordLink,
+  signUp,
+} from "./auth.service.js";
 import { successResponse } from "../../common/response/success-response.js";
 import axios from "axios";
 import { OAuth2Client } from "google-auth-library";
@@ -9,7 +18,14 @@ import { createCredential } from "../../common/utils/token.js";
 import { System } from "../../common/enums/system.js";
 import { BadRequestError } from "../../common/response/error-response.js";
 import { validate } from "../../middleware/validator.middleware.js";
-import { loginSchema, signUpSchema } from "./auth.validators.js";
+import {
+  confirmEmailSchema,
+  loginSchema,
+  resendOtpSchema,
+  resetPasswordLinkSchema,
+  resetPasswordSchema,
+  signUpSchema,
+} from "./auth.validators.js";
 
 const authRouter = Router();
 
@@ -32,10 +48,65 @@ authRouter.post("/login", validate(loginSchema), async (req, res) => {
   });
 });
 
+authRouter.patch(
+  "/confirm-email",
+  validate(confirmEmailSchema),
+  async (req, res) => {
+    const user = await confirmEmail(req.body);
+    return successResponse({
+      res,
+      data: user,
+      message: "Email confirmed successfully",
+    });
+  },
+);
+
+authRouter.post("/resend-otp", validate(resendOtpSchema), async (req, res) => {
+  await resendOtp(req.body);
+  return successResponse({ res, message: "OTP resent successfully" });
+});
+
+authRouter.post(
+  "/forget-password",
+  validate(resendOtpSchema),
+  async (req, res) => {
+    await forgetPassword(req.body);
+    return successResponse({ res, message: "OTP sent successfully" });
+  },
+);
+
+authRouter.post(
+  "/reset-password",
+  validate(resetPasswordSchema),
+  async (req, res) => {
+    await resetPassword(req.body);
+    return successResponse({ res, message: "Password reset successfully" });
+  },
+);
+
+authRouter.post(
+  "/forget-password-link",
+  validate(resendOtpSchema),
+  async (req, res) => {
+    await forgetPasswordLink(req.body);
+    return successResponse({ res, message: "Link sent successfully" });
+  },
+);
+
+authRouter.post(
+  "/reset-password-link/:token",
+  validate(resetPasswordLinkSchema),
+  async (req, res) => {
+    await resetPasswordLink(req.body, req.params);
+    return successResponse({ res, message: "Password reset successfully" });
+  },
+);
+
+// #####################################################
+
 let REDIRECT_URI = "http://localhost:8000/auth/google/callback";
-let CLIENT_ID =
-  "15133032516-hsqbau3n9snjc2fufoa7ucspkqdpbceb.apps.googleusercontent.com";
-let CLIENT_SECRET = "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";
+let CLIENT_ID = process.env.CLIENT_ID;
+let CLIENT_SECRET = process.env.CLIENT_SECRET;
 authRouter.get("/google", (req, res) => {
   const url =
     "https://accounts.google.com/o/oauth2/v2/auth?" +

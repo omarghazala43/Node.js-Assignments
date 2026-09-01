@@ -4,6 +4,18 @@ export const tokenKey = (userId, jti) => {
   return `TOKEN::${userId}::${jti}`;
 };
 
+export const otpKey = (email) => {
+  return `OTP::${email}`;
+};
+
+export const forgetOtpKey = (email) => {
+  return `OTP::FORGET_PASSWORD::${email}`;
+};
+
+export const forgetLinkKey = (email) => {
+  return `Link::FORGET_PASSWORD::${email}`;
+};
+
 export const redisService = {
   async get(key) {
     const result = await client.get(key);

@@ -5,10 +5,24 @@ import { globalErrHandler } from "./common/response/global-error-handler.js";
 import userRouter from "./modules/user/user.controller.js";
 import { resolve } from "path";
 import redisConnection from "./DB/redis.connection.js";
-import { redisService } from "./common/service/redis.service.js";
+import { config } from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit, { reteLimit } from "express-rate-limit";
 
 async function bootstrap() {
+  config();
   const app = express();
+  app.use(cors());
+  app.use(helmet());
+  const limiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    limit: 5,
+    legacyHeaders: false,
+  });
+
+  app.use(limiter);
+
   await DBconnection();
   await redisConnection();
 

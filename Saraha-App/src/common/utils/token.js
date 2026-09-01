@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 
 export const accessKey = "access";
 export const refreshKey = "refresh";
+export const resetPassKey = "reset password";
 export const generateToken = ({ data, key, expiresIn, subject }) => {
   const token = jwt.sign(data, key, {
     expiresIn: expiresIn ?? (key === refreshKey ? "7d" : "1h"),

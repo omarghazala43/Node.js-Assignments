@@ -43,3 +43,7 @@ export const create = ({ model, data }) => {
 export const updateOne = ({ model, filter, data }) => {
   return model.updateOne(filter, data);
 };
+
+export const findOneAndUpdate = ({ model, filter, data }) => {
+  return model.findOneAndUpdate(filter, data, { returnDocument: "after" });
+};

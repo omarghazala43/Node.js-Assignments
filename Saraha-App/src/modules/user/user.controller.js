@@ -12,8 +12,11 @@ import {
 import { validate } from "../../middleware/validator.middleware.js";
 import { updateUserImageSchema, updateUserSchema } from "./user.validation.js";
 import localUpload, { fileValidation } from "../../common/utils/multer.js";
+import messageRouter from "../messages/message.controller.js";
 
 const userRouter = Router();
+
+userRouter.use("/:userId/messages", messageRouter);
 
 userRouter.get("/profile", auth, async (req, res) => {
   const user = await getProfile(req.user._id);

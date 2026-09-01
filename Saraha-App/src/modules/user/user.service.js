@@ -51,7 +51,7 @@ export const logOut = async (_id, flag, jti, iat) => {
       data: { $set: { changeCredential: new Date() } },
     });
 
-    
+
   } else {
     await redisService.set({
       key: tokenKey(_id, jti),
@@ -70,3 +70,5 @@ export const createAccessToken = async (refreshToken) => {
 
   return accessToken;
 };
+
+
